@@ -1,16 +1,14 @@
 package geometries;
 
-import geometries.*;
-import primitives.*;
-
 import org.junit.jupiter.api.Test;
+import primitives.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Testing Polygons
  *
- * @author Dan
+ * @author Dan Zilberstein
  *
  */
 public class PolygonTest {
@@ -19,7 +17,7 @@ public class PolygonTest {
      * Test method for {@link geometries.Polygon#Polygon(primitives.Point...)}.
      */
     @Test
-    public void testConstructor() {
+    public void testConstructor1() {
         // ============ Equivalence Partitions Tests ==============
 
         // TC01: Correct concave quadrangular with vertices in correct order
@@ -28,11 +26,23 @@ public class PolygonTest {
         } catch (IllegalArgumentException e) {
             fail("Failed constructing a correct polygon");
         }
+    }
+    @Test
+    public void testConstructor2() {
+        // ============ Equivalence Partitions Tests ==============
 
         // TC02: Wrong vertices order
         assertThrows(IllegalArgumentException.class, //
-                () -> new Polygon(new Point(0, 0, 1), new Point(0, 1, 0), new Point(1, 0, 0), new Point(-1, 1, 1)), //
+                () -> new Polygon(
+                        new Point(0, 0, 1),
+                        new Point(0, 1, 0),
+                        new Point(1, 0, 0),
+                        new Point(-1, 1, 1)), //
                 "Constructed a polygon with wrong order of vertices");
+    }
+    @Test
+    public void testConstructor3() {
+        // ============ Equivalence Partitions Tests ==============
 
         // TC03: Not in the same plane
         assertThrows(IllegalArgumentException.class, //
@@ -71,8 +81,13 @@ public class PolygonTest {
     public void testGetNormal() {
         // ============ Equivalence Partitions Tests ==============
         // TC01: There is a simple single test here
-        Polygon pl = new Polygon(new Point(0, 0, 1), new Point(1, 0, 0), new Point(0, 1, 0), new Point(-1, 1, 1));
+        Polygon pl = new Polygon(
+                new Point(0, 0, 1),
+                new Point(1, 0, 0),
+                new Point(0, 1, 0),
+                new Point(-1, 1, 1));
         double sqrt3 = Math.sqrt(1d / 3);
         assertEquals(new Vector(sqrt3, sqrt3, sqrt3), pl.getNormal(new Point(0, 0, 1)), "Bad normal to trinagle");
     }
 }
+

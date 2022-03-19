@@ -2,6 +2,11 @@ package geometries;
 
 import primitives.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static primitives.Util.isZero;
+
 public class Plane implements  Geometry{
     Point q0;
     Vector normal;
@@ -12,14 +17,11 @@ public class Plane implements  Geometry{
     }
 
     public Plane(Point v1, Point v2, Point v3) {
+        Vector myVec1 = v3.subtract(v1);
+        Vector myVec2 = v2.subtract(v1);
+        this.q0 = v1;
 
-
-        Vector myVec1 = v1.subtract(v3);
-        Vector myVec2 = v3.subtract(v1);
-        this.q0 = new Point(v1.xyz);
-        Vector myV1=new Vector(v1.xyz);
-        Vector myV2=new Vector(v2.xyz);
-        this.normal =myV1.crossProduct(myV2).normalize();
+        this.normal =myVec2.crossProduct(myVec1).normalize();
     }
 
     public  Vector getNormal(Point p)
@@ -41,5 +43,35 @@ public class Plane implements  Geometry{
                 "q0=" + q0 +
                 ", normal=" + normal +
                 '}';
+    }
+
+    /**
+     * @param ray to find intersections points with the plane
+     * @return list of the intersections points with the plane
+     */
+    @Override
+    public List<Point> findIntersections(Ray ray) {
+
+        //N*v
+        double t_denominator = normal.dotProduct(ray.getDir());
+        //if the ray is parallel to the plane - there is no intersections points
+        if(t_denominator == 0)
+            return null;
+        //if the ray start in the normal point - there is no intersections points (q0 -p0 is vector 0 , ERROR)
+        if(normal.get_head().equals(ray.getP0()))
+            return null;
+        // (N * (q0 - p0)) / (N*v)
+        double t = normal.dotProduct(q0.subtract(ray.getP0())) / t_denominator;
+        Point p;
+        //only if t>0
+        if(!isZero(t) && t>0)
+            //p = p0 + t*v
+            p = ray.getPoint(t);
+        else
+            //if t<=0 there is no intersections points
+            return null;
+        ArrayList<Point> intsersection = new ArrayList<Point>();
+        intsersection.add(p);
+        return intsersection;
     }
 }

@@ -1,7 +1,10 @@
 package primitives;
 
+import geometries.Triangle;
+
 public class Point {
     public Double3  xyz;
+    public Triangle geometry;
 
     /**
      * Point constructor
@@ -71,5 +74,9 @@ public class Point {
     double distance(Point p)
     {
         return Math.sqrt(distanceSquared(p));
+    }
+
+    public Double3 getXyz() {
+        return xyz;
     }
 }
