@@ -51,9 +51,7 @@ public class Triangle extends  Polygon{
         if((sign1 > 0 && sign2 > 0 && sign3 > 0) || (sign1 < 0 && sign2 < 0 && sign3 < 0))
         {
             intsersection = (ArrayList<Point>) this.plane.findIntersections(ray);
-            if (intsersection != null) //to change the geometry type to this
-                for (Point i: intsersection)
-                    i.geometry = this;
+
             return intsersection;
         }
         return null;
