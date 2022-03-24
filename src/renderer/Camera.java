@@ -1,7 +1,11 @@
 package renderer;
 
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static primitives.Util.isZero;
 
@@ -124,9 +128,65 @@ public class Camera {
         return this;
     }
 
-    public Camera setVPDistance(double distance)
-    {
-        return  this;
+    /**
+     * Chaining method for setting the distance between the camera and the view plane.
+     *
+     * @param distance The new distance between the camera and the view plane.
+     * @return The camera itself.
+     * @throws IllegalArgumentException When distance illegal.
+     */
+    public Camera setVPDistance(double distance) {
+        if (distance <= 0) {
+            throw new IllegalArgumentException("Illegal value of distance");
+        }
+
+        this.distance = distance;
+        return this;
     }
 
+
+
+    /**
+     * The function calculate the center point of the pixel.
+     *
+     * @param nX Total number of pixels in the x dimension.
+     * @param nY Total number of pixels in the y dimension.
+     * @param j  The index of the pixel on the x dimension.
+     * @param i  The index of the pixel on the y dimension.
+     * @return the center point in the pixel.
+     */
+    private Point CalculateCenterPointInPixel(int nX, int nY, int j, int i) {
+        Point pC = p0.add(vTo.scale(distance));
+        Point pIJ = pC;
+
+        double rY = height / nY;
+        double rX = width / nX;
+
+        double yI = -(i - (nY - 1) / 2d) * rY;
+        double xJ = (j - (nX - 1) / 2d) * rX;
+
+        if (!isZero(xJ)) {
+            pIJ = pIJ.add(vRight.scale(xJ));
+        }
+        if (!isZero(yI)) {
+            pIJ = pIJ.add(vUp.scale(yI));
+        }
+        return pIJ;
+    }
+
+
+    /**
+     * Constructs a ray through a given pixel on the view plane.
+     *
+     * @param nX Total number of pixels in the x dimension.
+     * @param nY Total number of pixels in the y dimension.
+     * @param j The index of the pixel on the x dimension.
+     * @param i The index of the pixel on the y dimension.
+     * @return
+     */
+
+    public Ray constructRay(int nX, int nY, int j, int i) {
+        Point pCenterPixel = CalculateCenterPointInPixel(nX, nY, j, i);
+        return new Ray(p0, pCenterPixel.subtract(p0));
+    }
 }
