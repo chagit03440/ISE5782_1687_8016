@@ -16,10 +16,10 @@ public class Plane implements  Geometry{
         this.normal = normal;
     }
 
-    public Plane(Point v1, Point v2, Point v3) {
-        Vector myVec1 = v3.subtract(v1);
-        Vector myVec2 = v2.subtract(v1);
-        this.q0 = v1;
+    public Plane(Point p1, Point p2, Point p3) {
+        Vector myVec1 = p3.subtract(p1);
+        Vector myVec2 = p2.subtract(p1);
+        this.q0 = p1;
 
         this.normal =myVec2.crossProduct(myVec1).normalize();
     }

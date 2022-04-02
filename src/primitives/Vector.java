@@ -47,11 +47,6 @@ public class Vector extends Point{
      * @param head point of the ray
      */
 
-    public void set_head(Double3 head)
-    {
-        xyz = new Double3(head.d1,head.d2,head.d3);
-    }
-
     /**
      * @param obj - a vector object
      * @return if two vector object are equals

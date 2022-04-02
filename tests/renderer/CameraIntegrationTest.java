@@ -35,8 +35,6 @@ public class CameraIntegrationTest {
 
         List<Point> allpoints = null;
 
-        cam.setVPSize(3, 3);
-        cam.setVPDistance(1);
         int nX =3;
         int nY =3;
         //view plane 3X3 (WxH 3X3 & nx,ny =3 => Rx,Ry =1)
@@ -72,7 +70,7 @@ public class CameraIntegrationTest {
         int nX = 3, nY = 3;
         Camera cam1 = new Camera(new Point(0, 0, 0.5), new Vector(0, 0, -1), new Vector(0, 1, 0))
                 .setVPDistance(1)
-                .setVPSize(3, 3);
+                .setVPSize(nX, nY);
         // TC01: Small Sphere 2 points
         assertCountIntersections(cam1, new Sphere(new Point(0, 0, -2.5), 1.0), 2);
 
@@ -97,7 +95,7 @@ public class CameraIntegrationTest {
         int nX = 3, nY = 3;
         Camera cam = new Camera(new Point(0, 0, 0.5), new Vector(0, 0, -1), new Vector(0, 1, 0))
                 .setVPDistance(1)
-                .setVPSize(3, 3);
+                .setVPSize(nX, nY);
 
         // TC01: Plane against camera 9 points
         assertCountIntersections(cam, new Plane(new Point(0, 0, -2), new Vector(0, 0, 1)), 9);
@@ -109,7 +107,7 @@ public class CameraIntegrationTest {
         assertCountIntersections(cam, new Plane(new Point(0, 0, -3), new Vector(0, -1, 1)), 6);
 
         // TC04: Beyond Plane 0 points
-        assertCountIntersections(cam, new Plane(new Point(0, 0, -5), new Vector(0, 1, 1)), 6);
+        assertCountIntersections(cam, new Plane(new Point(0, -5, 0), new Vector(-1, -9, 13)), 0);
     }
 
     /**
@@ -120,7 +118,7 @@ public class CameraIntegrationTest {
         int nX = 3, nY = 3;
         Camera cam = new Camera(new Point(0, 0, 0.5), new Vector(0, 0, -1), new Vector(0, 1, 0))
                 .setVPDistance(1)
-                .setVPSize(3, 3);
+                .setVPSize(nX, nY);
 
         // TC01: Small triangle 1 point
         assertCountIntersections(cam,  new Triangle(new Point(0, 1, -2), new Point(1, -1, -2), new Point(-1, -1, -2)), 1);

@@ -1,11 +1,13 @@
 package renderer;
 
+import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.MissingResourceException;
 
 import static primitives.Util.isZero;
 
@@ -38,6 +40,18 @@ public class Camera {
      * The distance between the camera and the view plane.
      */
     private double distance;
+    private  ImageWriter iM;
+    private  RayTracerBase rT;
+
+    public Camera setImageWriter(ImageWriter iM) {
+        this.iM = iM;
+        return this;
+    }
+
+    public Camera setRayTracer(RayTracerBase rT) {
+        this.rT = rT;
+        return this;
+    }
 
     /**
      * Returns the camera location.
@@ -189,4 +203,53 @@ public class Camera {
         Point pCenterPixel = CalculateCenterPointInPixel(nX, nY, j, i);
         return new Ray(p0, pCenterPixel.subtract(p0));
     }
+    /**
+     * For each pixel a ray will be built and for each ray we will get a color from the ray tracer.
+     * Put the color in a suitable pixel of the image writer
+     */
+    public void renderImage() {
+        try {
+            //check that no null value has been assigned in imageWriter and rayTracer fields
+            if (iM == null) {
+                throw new MissingResourceException("missing resource", ImageWriter.class.getName(), "");
+            }
+            if (rT == null) {
+                throw new MissingResourceException("missing resource",RayTracerBase.class.getName(), "");
+            }
+
+            //rendering the image
+            int nX = iM.getNx();
+            int nY = iM.getNy();
+            for (int i = 0; i < nX; i++) {
+                for (int j = 0; j < nY; j++) {
+                    Ray ray = constructRay(nX, nY, j, i);
+                    Color pixelColor = rT.traceRay(ray);
+                    iM.writePixel(j, i, pixelColor);
+                }
+            }
+        } catch (MissingResourceException e) {
+            throw new UnsupportedOperationException("Not implemented yet" + e.getClassName());
+        }
+    }
+    /**
+     * create a grid of lines in the view plane
+     * @param interval is the interval space between each line
+     * @param color is the color of each line
+     */
+    public void printGrid(int interval, Color color) {
+        iM.printGrid(interval,color);
+    }
+    /**
+     * call writeToImage in ImageWriter that produces unoptimized png file of the image
+     * according to the pixel color matrix in the directory of the project
+     */
+    public void writeToImage() {
+        //check that no null value has been assigned to imageWriter
+        if (iM == null) {
+            throw new MissingResourceException("missing resource", ImageWriter.class.getName(), "");
+        }
+        iM.writeToImage();
+    }
 }
+
+

@@ -4,6 +4,7 @@ import geometries.Triangle;
 
 public class Point {
     public Double3  xyz;
+    public  final  static Point ZERO=new Point(0d,0d,0d);
     public Triangle geometry;
 
     /**

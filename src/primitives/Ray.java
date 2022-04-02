@@ -1,5 +1,7 @@
 package primitives;
 
+import java.util.List;
+
 import static primitives.Util.isZero;
 
 public class Ray {
@@ -74,5 +76,32 @@ public class Ray {
     public Point getPoint(double t)
     {
         return isZero(t) ? p0 : new Point(p0.getXyz()).add(dir.scale(t));
+    }
+    /**
+     * The function find the closest points to P0 of the ray
+     * @param points
+     * @return Point3D the closes point
+     */
+
+    public Point findClosestPoint(List<Point> points) {
+
+        double minDistance = Double.MAX_VALUE;
+        double d;
+        Point closePoint = null;
+
+        if(points==null){
+            return null;
+        }
+
+        for (Point p : points) {
+
+            d = p.distance(p0);
+            //check if the distance of p is smaller then minDistance
+            if (d < minDistance) {
+                minDistance = d;
+                closePoint = p;
+            }
+        }
+        return closePoint;
     }
 }
