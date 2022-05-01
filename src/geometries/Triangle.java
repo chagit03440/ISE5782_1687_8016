@@ -13,48 +13,59 @@ import primitives.Point;
 import primitives.Vector;
 
 import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
 
 public class Triangle extends  Polygon{
-    public Triangle(Point... vertices) {
-        super(vertices);
+    /**
+     * constructor for Triangle
+     *
+     * @param p1 point 1 of the triangle
+     * @param p2 point 2 of the triangle
+     * @param p3 point 3 of the triangle
+     */
+    public  Triangle(Point p1, Point p2, Point p3) {
+        super(p1, p2, p3);
+
     }
     /**
      * @param ray to find intersections points with the triangle
      * @return list of the intersections points with the triangle
      */
     @Override
-    public ArrayList<Point> findIntersections(Ray ray) {
-        //v1 = p1 - p0
-        Vector v1 = vertices.get(0).subtract(ray.getP0());
-        //v2 = p2 - p0
-        Vector v2 = vertices.get(1).subtract(ray.getP0());
-        //v3 = p3 - p0
-        Vector v3 = vertices.get(2).subtract(ray.getP0());
-        //N1 = normalize(v1 x v2)
-        Vector N1 = v1.crossProduct(v2).normalize();
-        //N1 = normalize(v2 x v3)
-        Vector N2 = v2.crossProduct(v3).normalize();
-        //N1 = normalize(v3 x v1)
-        Vector N3 = v3.crossProduct(v1).normalize();
-        //v*N1
-        double sign1 = ray.getDir().dotProduct(N1);
-        //v*N2
-        double sign2 = ray.getDir().dotProduct(N2);
-        //v*N3
-        double sign3 = ray.getDir().dotProduct(N3);
-        // if one or more are 0.0 – no intersection
-        alignZero(sign1);
-        alignZero(sign2);
-        alignZero(sign3);
-        //The point is inside if all v*Ni have the same sign
-        ArrayList<Point> intsersection = new ArrayList<Point>();
-        if((sign1 > 0 && sign2 > 0 && sign3 > 0) || (sign1 < 0 && sign2 < 0 && sign3 < 0))
-        {
-            intsersection = (ArrayList<Point>) this.plane.findIntersections(ray);
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        //first find the intersections with the plane in which the triangle lays
+        List<GeoPoint> intersections = plane.findGeoIntersections(ray);
 
-            return intsersection;
+        //if the plane has no intersections so there are no intersections, so return null
+        if (intersections == null)
+            return null;//there are no intersection points
+
+        Point p0 = ray.getP0();//the start ray point
+        Vector v = ray.getDir();
+
+        Vector v1 = vertices.get(0).subtract(p0);//vector from the ray start point to the polygon vertices
+        Vector v2 = vertices.get(1).subtract(p0);//vector from the ray start point to the polygon vertices
+        Vector v3 = vertices.get(2).subtract(p0);//vector from the ray start point to the polygon vertices
+
+        double s1 = v.dotProduct(v1.crossProduct(v2)); //s1 = v * (v1 X v2)
+        if (isZero(s1))
+            return null;//the point is out of triangle
+
+        double s2 = v.dotProduct(v2.crossProduct(v3)); //s2 = v * (v2 X v3)
+        if (isZero(s2))
+            return null;//the point is out of triangle
+
+        double s3 = v.dotProduct(v3.crossProduct(v1)); //s3 = v * (v3 X v1)
+        if (isZero(s3))
+            return null;//the point is out of triangle
+
+        //update the geometry
+        for (GeoPoint gp : intersections) {
+            gp.geometry = this;
         }
-        return null;
+
+        //if they all have the same sign then return the intersections , otherwise return null
+        return ((s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) ? intersections : null;
     }
 
 }

@@ -90,11 +90,17 @@ public class ImageWriter {
         image.setRGB(xIndex, yIndex, color.getColor().getRGB());
     }
     public void printGrid(int interval, Color color) {
-        for (int i = 0; i < nX; i++) {
+        for (int i = 0; i < nX; i+= interval) {
             for (int j = 0; j < nY; j++) {
-                if (i % interval == 0 || j % interval == 0) {
                     writePixel(i, j, color);
-                }
+
+            }
+        }
+
+        for (int i = 0; i < nX; i++) {
+            for (int j = 0; j < nY; j+= interval) {
+                writePixel(i, j, color);
+
             }
         }
     }

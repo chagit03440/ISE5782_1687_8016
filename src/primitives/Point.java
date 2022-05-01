@@ -26,6 +26,17 @@ public class Point {
         Double3 head = new Double3(x, y, z);
         this.xyz = head;
     }
+    public double getX() {
+        return xyz.d1;
+    }
+
+    public double getY() {
+        return xyz.d2;
+    }
+
+    public double getZ() {
+        return xyz.d3;
+    }
     /**
      * Subtract two floating point triads into a new triad where each couple of
      * numbers is subtracted
@@ -72,7 +83,7 @@ public class Point {
     {
        return (xyz.d1-p.xyz.d1)*(xyz.d1-p.xyz.d1)+(xyz.d2-p.xyz.d2)*(xyz.d2-p.xyz.d2)+(xyz.d3-p.xyz.d3)*(xyz.d3-p.xyz.d3);
     }
-    double distance(Point p)
+    public double distance(Point p)
     {
         return Math.sqrt(distanceSquared(p));
     }

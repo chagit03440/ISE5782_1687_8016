@@ -5,9 +5,10 @@ import primitives.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
 
-public class Plane implements  Geometry{
+public class Plane extends  Geometry{
     Point q0;
     Vector normal;
 
@@ -50,28 +51,39 @@ public class Plane implements  Geometry{
      * @return list of the intersections points with the plane
      */
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        Point P0 = ray.getP0();
+        Vector v = ray.getDir();
+        Vector n = normal;
+        double nv = n.dotProduct((v)); //nv=n*v
 
-        //N*v
-        double t_denominator = normal.dotProduct(ray.getDir());
-        //if the ray is parallel to the plane - there is no intersections points
-        if(t_denominator == 0)
+        // ray parallel to plane
+        if (isZero(nv)) {
             return null;
-        //if the ray start in the normal point - there is no intersections points (q0 -p0 is vector 0 , ERROR)
-        if(normal.get_head().equals(ray.getP0()))
+        }
+
+        //  ray cannot start from the plane
+        if (q0.equals(P0)) {
             return null;
-        // (N * (q0 - p0)) / (N*v)
-        double t = normal.dotProduct(q0.subtract(ray.getP0())) / t_denominator;
-        Point p;
-        //only if t>0
-        if(!isZero(t) && t>0)
-            //p = p0 + t*v
-            p = ray.getPoint(t);
-        else
-            //if t<=0 there is no intersections points
+        }
+
+        Vector Q0_P0 = q0.subtract(P0);
+
+        double numerator = n.dotProduct(Q0_P0); //numerator=n*Q0_P0
+
+        //in this case P0 is on the plane, so return null
+        if (isZero(numerator)) {
             return null;
-        ArrayList<Point> intsersection = new ArrayList<Point>();
-        intsersection.add(p);
-        return intsersection;
+        }
+        double t = alignZero(numerator / nv); //t=numerator/nv
+
+        //if t>0 the ray does point toward the plane
+        if (t > 0) {
+            GeoPoint P = new GeoPoint(this, P0.add(v.scale(t))); //new GeoPoint{geometry=this, point=p0+tv}
+            return List.of(P);
+        }
+        //otherwise it doesn't point toward the plane, so return null
+        return null;
     }
+
 }
