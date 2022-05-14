@@ -56,4 +56,22 @@ public class Geometries extends Intersectable{
         }
         return result;
     }
+
+    @Override
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+        List<GeoPoint> result = null;
+
+        //iterate over the list of the geometries and find the intersections for each one
+        //add the results to list "result"
+        for (Intersectable item : _geometries) {
+            List<GeoPoint> itemGeoPoints = item.findGeoIntersections(ray, maxDistance);
+            if (itemGeoPoints != null) {
+                if (result == null) {
+                    result = new LinkedList<>();
+                }
+                result.addAll(itemGeoPoints);
+            }
+        }
+        return result;
+    }
 }

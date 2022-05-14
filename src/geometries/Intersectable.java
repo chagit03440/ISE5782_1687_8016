@@ -75,13 +75,36 @@ public abstract class Intersectable {
     }
 
 
-
+    /**
+     * find intersection of ray with geometries
+     *
+     * @param ray the ray that intersects
+     * @return list of Point
+     */
     public List<Point> findIntersections(Ray ray) {
         var geoList = findGeoIntersections(ray);
         return geoList == null ? null
                 : geoList.stream().map(gp -> gp.point).toList();
     }
-
+    /**
+     * returns all intersection that are closer to the ray than max distance
+     *
+     * @param ray         the ray that intersects
+     * @param maxDistance the maximum distance
+     * @return list of GeoPoint
+     */
+    public final List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
+        return findGeoIntersectionsHelper(ray, maxDistance);
+    }
+    /**
+     * helper function for finding intersections
+     *
+     * @param ray         the ray that intersects
+     * @param maxDistance the maximum distance
+     * @return list of GeoPoint
+     */
+    protected abstract List<GeoPoint>
+    findGeoIntersectionsHelper(Ray ray, double maxDistance);
 }
 
 

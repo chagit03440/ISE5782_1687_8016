@@ -5,7 +5,7 @@ import geometries.Intersectable.GeoPoint;
 import static primitives.Util.isZero;
 
 public class Ray {
-
+    private static final double DELTA = 0.1;
     /**
      * The point from which the ray starts.
      */
@@ -30,7 +30,16 @@ public class Ray {
         this.p0 = new Point(point.xyz);
         this.dir = new Vector(vector.normalize().xyz);
     }
-
+    /**
+     * costruct a ray and move point slightly
+     *  @param point     the point
+     * @param direction direction vector
+     * @param n         normal
+     */
+    public Ray(Point point, Vector direction, Vector n) {
+        this.p0 = point.add(n.scale(DELTA));
+        this.dir= direction.normalize();
+    }
 
     /**
      * @param obj - a ray object
