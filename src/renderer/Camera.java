@@ -207,7 +207,7 @@ public class Camera {
      * For each pixel a ray will be built and for each ray we will get a color from the ray tracer.
      * Put the color in a suitable pixel of the image writer
      */
-    public void renderImage() {
+    public Camera renderImage() {
         try {
             //check that no null value has been assigned in imageWriter and rayTracer fields
             if (iM == null) {
@@ -230,6 +230,7 @@ public class Camera {
         } catch (MissingResourceException e) {
             throw new UnsupportedOperationException("Not implemented yet" + e.getClassName());
         }
+        return this;
     }
     /**
      * create a grid of lines in the view plane
