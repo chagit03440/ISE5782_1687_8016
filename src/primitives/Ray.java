@@ -1,135 +1,142 @@
 package primitives;
 
-import java.util.List;
+import geometries.Intersectable;
 import geometries.Intersectable.GeoPoint;
+import java.util.List;
+import java.util.Objects;
 import static primitives.Util.isZero;
 
+
+/**
+ * class for Ray
+ */
 public class Ray {
-    private static final double DELTA = 0.1;
-    /**
-     * The point from which the ray starts.
-     */
+    final Point p0; //center point of the ray
+    final Vector dir; //direction of the ray
 
-    Point p0;
-
-    /**
-     * The direction of the ray.
-     */
-
-    Vector dir;
+    //for constructing reflected and refracted rays
+    private static final double DELTA = 0.01;
 
     /**
-     * Constructor for creating a new Ray of this class
+     * Constructor of the ray
      *
-     * @param point  the start of the ray.
-     * @param vector the direction of the ray.
+     * @param point  center point of the ray
+     * @param vector direction of the ray
      */
-
     public Ray(Point point, Vector vector) {
-
-        this.p0 = new Point(point.xyz);
-        this.dir = new Vector(vector.normalize().xyz);
-    }
-    /**
-     * costruct a ray and move point slightly
-     *  @param point     the point
-     * @param direction direction vector
-     * @param n         normal
-     */
-    public Ray(Point point, Vector direction, Vector n) {
-        this.p0 = point.add(n.scale(DELTA));
-        this.dir= direction.normalize();
+        p0 = point;
+        dir = vector.normalize();
     }
 
     /**
-     * @param obj - a ray object
-     * @return if two ray object are equals
+     * Constructor that gets 3 parameters
+     * @param point
+     * @param direction
+     * @param normal
+     * @return point + normal.scale(DELTA)
      */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Ray other = (Ray) obj;
-        if (p0 == null) {
-            if (other.p0 != null)
-                return false;
-        } else if (!p0.equals(other.p0))
-            return false;
-        if (dir == null) {
-            if (other.dir != null)
-                return false;
-        } else if (!dir.equals(other.dir))
-            return false;
-        return true;
+    public Ray(Point point, Vector direction, Vector normal)
+    {
+        this.dir = direction.normalize();
+        double nV = normal.dotProduct(direction);
+        Vector delta = normal.scale(nV >= 0 ? DELTA : -DELTA);
+        this.p0 = point.add(delta);
     }
 
     /**
-     * print the details of the ray
+     * returns the point of the ray
+     *
+     * @return the point
      */
-    @Override
-    public String toString() {
-        return "Ray [_POO=" + p0 + ", _direction=" + dir + "]";
-    }
-
     public Point getP0() {
         return p0;
     }
 
+    /**
+     * returns the vector(direction) of the ray
+     *
+     * @return vector
+     */
     public Vector getDir() {
         return dir;
     }
-    public Point getPoint(double t)
-    {
-        return isZero(t) ? p0 : new Point(p0.getXyz()).add(dir.scale(t));
-    }
+
     /**
-     * The function find the closest points to P0 of the ray
-     * @param points
-     * @return Point3D the closes point
+     * compare between two rays
+     *
+     * @param o is the object
+     * @return true if the rays are equals
      */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ray ray = (Ray) o;
+        return p0.equals(ray.p0) && dir.equals(ray.dir);
+    }
 
-    public Point findClosestPoint(List<Point> points) {
+    /**
+     * @return an integer value - same hashCode if the rays are equals
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(p0, dir);
+    }
 
-        double minDistance = Double.MAX_VALUE;
+    /**
+     * override function for to string
+     *
+     * @return the ray's values
+     */
+    @Override
+    public String toString() {
+        return "Ray{" +
+                "p0=" + p0 +
+                ", dir=" + dir +
+                '}';
+    }
+
+    /**
+     * @param t is a scalar
+     * @return the point applied to the function multiplied by the scalar
+     */
+    public Point getPoint(double t) {
+        if (isZero(t)) {
+            return p0;
+        }
+        return p0.add(dir.normalize().scale(t));
+    }
+
+    /**
+     * In the intersections - find the point with minimal distance from the ray
+     * head and return it
+     * @param geoPointList intersection points
+     * @return closest point
+     */
+    public GeoPoint findClosestGeoPoint (List<GeoPoint> geoPointList) {
+        GeoPoint result = null;
+        double distance = Double.MAX_VALUE;
         double d;
-        Point closePoint = null;
-
-        if(points==null){
+        if(geoPointList==null){
             return null;
         }
-
-        for (Point p : points) {
-
-            d = p.distanceSquared(p0);
-            //check if the distance of p is smaller then minDistance
-            if (d < minDistance) {
-                minDistance = d;
-                closePoint = p;
+        for (var geo : geoPointList) {
+            d = geo.point.distance(p0);
+            if (d < distance) {
+                distance = d;
+                result = geo;
             }
         }
-        return closePoint;
-    }
-    public GeoPoint findClosestGeoPoint(List<GeoPoint > pointList) {
-        double minDistance = Double.MAX_VALUE;
-        double geoPointDistance;
-
-        if(pointList== null){
-            return null;
-        }
-
-        GeoPoint closestPoint = null;
-        for (GeoPoint geopoint : pointList) {
-            geoPointDistance = geopoint.point.distanceSquared(p0);
-            if (geoPointDistance < minDistance) {
-                minDistance = geoPointDistance;
-                closestPoint = geopoint;
-            }
-        }
-        return closestPoint;
+        return result;
     }
 
+    /**
+     * find the closet Point that intersects with the ray
+     * @param points intersection points list
+     * @return the closest point
+     */
+    public Point findClosestPoint(List<Point> points) {
+        return points == null || points.isEmpty() ? null
+                : findClosestGeoPoint(points.stream().map(p -> new GeoPoint(null, p)).toList()).point;
+    }
 }

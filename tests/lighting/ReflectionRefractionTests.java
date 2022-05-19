@@ -107,4 +107,33 @@ public class ReflectionRefractionTests {
                 .renderImage() //
                 .writeToImage();
     }
+    /**
+     * Produce a picture of a triangle lighted by a spot light with a partially transparent Sphere
+     *  producing partial shadow
+     */
+    @Test
+    public void selfTest() {
+        Scene scene = new Scene("Test scene");
+        Camera camera= new Camera(new Point(0, 0, -1000), new Vector(0, 0, 1), new Vector(0, -1, 0))
+                .setVPSize(200, 200).setVPDistance(1000);
+        scene.setBackground(Color.BLACK);
+        scene.setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE),new Double3( 0.15)));
+
+        scene.geometries.add( //
+                //new Triangle(Color.BLACK, new Material(0.5, 0.5, 60), //
+                //new Point3D(-150, 150, 115), new Point3D(150, 150, 135), new Point3D(75, -75, 150)), //
+                new Triangle( new Point(-10, 150, 115), new Point(-70, -70, 140), new Point(100, -75, 130)).setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(60)).setEmission(Color.BLACK)); //
+                new Sphere(new Point(-10, -70, 50),20).setEmission( new Color(java.awt.Color.BLUE)).setMaterial( new Material().setKd(0.2).setKs(0.2).setShininess(30)); // )
+                        ;
+
+        scene.lights.add(new SpotLight(new Color(700, 400, 400), //
+                new Point(-10, -70, 0), new Vector(0, 0, 1)).setKl(4E-5) .setKq(2E-7));
+
+        ImageWriter imageWriter = new ImageWriter("selfTest", 600, 600);
+
+        camera.setImageWriter(imageWriter) //
+                .setRayTracer(new RayTracerBasic(scene)) //
+                .renderImage() //
+                .writeToImage();
+    }
 }
