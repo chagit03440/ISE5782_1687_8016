@@ -112,28 +112,85 @@ public class ReflectionRefractionTests {
      *  producing partial shadow
      */
     @Test
-    public void selfTest() {
-        Scene scene = new Scene("Test scene");
-        Camera camera= new Camera(new Point(0, 0, -1000), new Vector(0, 0, 1), new Vector(0, -1, 0))
-                .setVPSize(200, 200).setVPDistance(1000);
-        scene.setBackground(Color.BLACK);
-        scene.setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE),new Double3( 0.15)));
+    public void Bonus() {
+        Camera camera = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
+                .setVPSize(600, 600).setVPDistance(1000);
+
+        scene.setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE), new Double3(0.15)));
 
         scene.geometries.add( //
-                //new Triangle(Color.BLACK, new Material(0.5, 0.5, 60), //
-                //new Point3D(-150, 150, 115), new Point3D(150, 150, 135), new Point3D(75, -75, 150)), //
-                new Triangle( new Point(-10, 150, 115), new Point(-70, -70, 140), new Point(100, -75, 130)).setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(60)).setEmission(Color.BLACK)); //
-                new Sphere(new Point(-10, -70, 50),20).setEmission( new Color(java.awt.Color.BLUE)).setMaterial( new Material().setKd(0.2).setKs(0.2).setShininess(30)); // )
-                        ;
+                new Triangle(new Point(-130, -150, -115), new Point(150, -150, -135), new Point(75, 75, -150)) //
+                        .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(60)).setEmission(new Color(java.awt.Color.magenta)), //
+                new Triangle(new Point(-120, -130, -130), new Point(140, -140, -135), new Point(65, 65, -140)), //
+                new Triangle(new Point(110, -150, -150), new Point(-150, 1500, -150),
+                        new Point(67, 67, 300)) //
+                        .setEmission(new Color(java.awt.Color.ORANGE)) //
+                        .setMaterial(new Material().setKr(new Double3(1.0)).setKt(new Double3(0.5))),
+                new Triangle(new Point(150, -150, -150), new Point(-1500, 1500, -1500),
+                        new Point(-150, -150, -200)) //
+                        .setEmission(new Color(0, 120, 220)) //
+                        .setMaterial(new Material().setKr(new Double3(1)).setKt(new Double3(0.5))),
+                new Sphere( new Point(140, -150, -100),25) //
+                        .setEmission(new Color(java.awt.Color.cyan)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(10).setKr(new Double3(0.4))),
+                new Sphere( new Point(140, -60, -100),15) //
+                        .setEmission(new Color(java.awt.Color.cyan)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(10).setKr(new Double3(0.4))),
+                new Sphere( new Point(140, 10, -100),25) //
+                        .setEmission(new Color(java.awt.Color.cyan)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(10).setKr(new Double3(0.4))),
+                new Sphere( new Point(140, 80, -100),15) //
+                        .setEmission(new Color(java.awt.Color.cyan)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(10).setKr(new Double3(0.4))),
+                new Sphere( new Point(-100, 150, 50),35) //
+                        .setEmission(new Color(java.awt.Color.cyan)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(30).setKr(new Double3(1))),
+                new Sphere( new Point(-75, 100, 50),45) //
+                        .setEmission(new Color(java.awt.Color.magenta)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(30).setKr(new Double3(0.6))),
+                new Sphere( new Point(-55, 100, 50),35) //
+                        .setEmission(new Color(java.awt.Color.cyan)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(10).setKr(new Double3(0.3))),
+                new Sphere( new Point(-30, 100, 50),25) //
+                        .setEmission(new Color(java.awt.Color.magenta)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(30).setKr(new Double3(0.6))),
+                new Sphere( new Point(-10, 100, 50),20) //
+                        .setEmission(new Color(java.awt.Color.cyan)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(10).setKr(new Double3(0.5))),
+                new Sphere( new Point(15, 100, 50),15) //
+                        .setEmission(new Color(java.awt.Color.magenta)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(30).setKr(new Double3(0.6))),
+                new Sphere( new Point(40, 100, 50),10) //
+                        .setEmission(new Color(java.awt.Color.cyan)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(10).setKr(new Double3(0.6))),
+                new Sphere( new Point(50, 100, 50),5) //
+                        .setEmission(new Color(java.awt.Color.magenta)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(30).setKr(new Double3(0.6))),
+                new Sphere( new Point(70, -10, -100),10) //
+                        .setEmission(new Color(java.awt.Color.cyan)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(10).setKr(new Double3(0.4))),
+                new Sphere( new Point(75, 75, 50),30) //
+                        .setEmission(new Color(java.awt.Color.yellow)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(10).setKr(new Double3(0.6))),
+                new Sphere( new Point(-350, -300, -400),400) //
+                        .setEmission(new Color(0, 0, 100)) //
+                        .setMaterial(new Material().setKd(0.25).setKs(0.25).setShininess(20).setKr(new Double3(0.5))),
+                new Sphere( new Point(-350, -300, -400),200) //
+                        .setEmission(new Color(100, 120, 120)) //
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(20)),
+                new Polygon(new Point(100,100,0),new Point(-70, 70, -140),new Point(140, -140, -125)).setEmission(new Color(java.awt.Color.blue))
+                        .setMaterial(new Material().setKd(0.2).setKs(0.2).setShininess(30).setKt(new Double3(0.6)).setKr(new Double3(0.8)))
 
-        scene.lights.add(new SpotLight(new Color(700, 400, 400), //
-                new Point(-10, -70, 0), new Vector(0, 0, 1)).setKl(4E-5) .setKq(2E-7));
-
-        ImageWriter imageWriter = new ImageWriter("selfTest", 600, 600);
-
+        );
+        scene.lights.add(new SpotLight(new Color(700, 400, 400),new Vector(0, 0, -1), new Vector(60, 50, 0)) //
+                .setKq(2E-7)); //.setkQ(0.000005));
+        scene.lights.add(new SpotLight(new Color(1020, 400, 400), new Vector(-1, -1, -4), new Vector(-750, -750, -150)));
+        ImageWriter imageWriter = new ImageWriter("bonus", 600, 600);
         camera.setImageWriter(imageWriter) //
                 .setRayTracer(new RayTracerBasic(scene)) //
                 .renderImage() //
                 .writeToImage();
+
     }
+
 }
