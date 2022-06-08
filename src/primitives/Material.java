@@ -14,7 +14,8 @@ public class Material {
     public Double3 kT=Double3.ZERO;
     // Field represents the reflectivity attenuation factor
     public Double3 kR=Double3.ZERO;
-
+    // Field represents the Glossy attenuation factor
+    public double kG=1 ;
 
     /**
      * Builder patterns setter for field kD
@@ -74,6 +75,10 @@ public class Material {
         this.kR = kR;
         return this;
     }
+    public Material setKr(double kR) {
+        this.kR =new Double3(kR);
+        return this;
+    }
 
     /**
      * Builder patterns setter for field kT
@@ -84,4 +89,18 @@ public class Material {
         this.kT = kT;
         return this;
     }
+    public Material setKt(double kT) {
+        this.kT = new Double3(kT);
+        return this;
+    }
+    /**
+     * Chaining method for setting the glossiness of the material.
+     * @param kG the glossiness to set, value in range [0,1]
+     * @return the current material
+     */
+    public Material setkG(double kG) {
+        this.kG = Math.pow(kG, 0.5);
+        return this;
+    }
+
 }
