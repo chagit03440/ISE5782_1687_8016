@@ -5,6 +5,7 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -251,6 +252,57 @@ public class Camera {
         }
         iM.writeToImage();
     }
+    /**
+     *
+     * @param Nx
+     * @param Ny
+     * @param j
+     * @param i
+     * @return
+     * improving the jagged edges - mini project 1
+     */
+    public List<Ray> constructRays(int Nx, int Ny, int j, int i)
+    {
+        //Image center
+        Point Pc = p0.add(vTo.scale(distance));
+
+        //Ratio (pixel width & height)
+        double Ry =height/ Ny;
+        double Rx = width/Nx;
+
+        //delta values for going to Pixel[i,j] from Pc
+        double yI =  -(i - (Ny -1)/2)* Ry;
+        double xJ =  (j - (Nx -1)/2)* Rx;
+
+        if (! isZero(xJ) )
+        {
+            Pc = Pc.add(vRight.scale(xJ));
+        }
+
+        if (! isZero(yI))
+        {
+            Pc = Pc.add(vUp.scale(yI));
+        }
+        List<Ray> rays=new ArrayList<>();
+
+        /**
+         * puts the pixel center in the first place on the list.
+         */
+        rays.add(new Ray(p0,Pc.subtract(p0)));
+
+        /**
+         * creating Ry*Rx rays for each pixel.
+         */
+        Point newPoint=new Point(Pc.getX()-Rx/2,Pc.getY()+Rx/2,Pc.getZ());
+        for (double t = newPoint.getY(); t >newPoint.getY()-Ry; t-=0.01)
+        {
+            for (double k = newPoint.getX(); k < newPoint.getX()+Rx; k+=0.01)
+            {
+                rays.add(new Ray(p0,new Point(k,t,Pc.getZ()).subtract(p0)));
+            }
+        }
+
+        return rays;
+    }
+
 }
-
-

@@ -5,10 +5,12 @@ import primitives.*;
 import scene.Scene;
 import geometries.Intersectable.GeoPoint;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Math.*;
 import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
 
 public class RayTracerBasic extends  RayTracerBase{
     /**
@@ -24,7 +26,13 @@ public class RayTracerBasic extends  RayTracerBase{
     private static final double MIN_CALC_COLOR_K = 0.001;
     private static final double INITIAL_K = 1.0 ;
 
+    private int glossinessRaysNum = 36;
+    private double distanceGrid = 25;
+    private double sizeGrid=4;
 
+    public void setDistanceGrid(double distanceGrid) {
+        this.distanceGrid = distanceGrid;
+    }
     /**
      * search for shadow shape
      * @param gp is the point to check if it's unshaded or not
@@ -91,31 +99,52 @@ public class RayTracerBasic extends  RayTracerBase{
      */
     private Color calcColor(GeoPoint intersection, Ray ray, int level, Double3 k) {
         Color color = calcLocalEffect(intersection, ray, k);
-        return 1 == level ? color : color.add(calcGlobalEffects(intersection, ray.getDir(), level, k));
+        return 1 == level ? color : color.add(calcGlobalEffects(intersection, ray, level, k));
     }
 
     /**
      * calc the global effects- reflection and refraction.
      * this func call "calcColor" in recursion to add more and more global effects.
      * @param gp is the point to calculate the global effects of
-     * @param v is the vector ray normalized
      * @param level of recursion- goes down each time till it gets to 1
      * @param k- factor of reflection and refraction so far
      * @return the color of the effect
      */
-    private Color calcGlobalEffects(GeoPoint gp, Vector v, int level, Double3 k) {
+    private Color calcGlobalEffects(GeoPoint gp, Ray ray, int level, Double3 k){
         Color color = Color.BLACK;
-        Vector n = gp.geometry.getNormal(gp.point);
         Material material = gp.geometry.getMaterial();
-        Double3 kkr = material.kR.product(k);
-        if (!kkr.lowerThan(MIN_CALC_COLOR_K))
-            color = calcGlobalEffect(constructReflectedRay(gp.point, v, n), level, material.kR, kkr);
-        Double3 kkt = material.kT.product(k);
-        if (!kkt.lowerThan(MIN_CALC_COLOR_K))
-            color = color.add(
-                    calcGlobalEffect(constructRefractedRay(gp.point, v, n), level, material.kT, kkt));
+        Double3 kr = material.getkR();
+        Double3 kkr = k.product(kr); //in each recursive iteration the impact of the reflection decreases
+        Vector n = gp.geometry.getNormal(gp.point);
+        if (!kkr.lowerThan(MIN_CALC_COLOR_K)) {
+            List<Ray> reflectedRays = constructReflectedRays(gp,ray, material.getkG());
+            primitives.Color tempColor1 = primitives.Color.BLACK;
+            // each ray
+            for(Ray reflectedRay: reflectedRays)
+            {
+                GeoPoint reflectedPoint = findClosestIntersection(reflectedRay);
+                tempColor1 = tempColor1.add(reflectedPoint == null ? primitives.Color.BLACK : calcColor(reflectedPoint, reflectedRay, level - 1, kkr).scale(kr));
+            }
+
+            color = color.add(tempColor1.reduce(reflectedRays.size()));
+        }
+        Double3 kt = material.getkT();
+        Double3 kkt = k.product(kt); //in each recursive iteration the impact of the refraction decreases
+        if (!kkt.lowerThan(MIN_CALC_COLOR_K)) {
+            List<Ray> refractedRays = constructRefractedRays(gp,ray,n);
+            primitives.Color tempColor2 = primitives.Color.BLACK;
+            //calculate for each ray
+            for(Ray refractedRay: refractedRays)
+            {
+                GeoPoint refractedPoint = findClosestIntersection(refractedRay);
+                tempColor2 = tempColor2.add(refractedPoint == null? primitives.Color.BLACK : calcColor(refractedPoint, refractedRay, level -1, kkt).scale(kt));
+            }
+
+            color = color.add(tempColor2.reduce(refractedRays.size()));
+        }
         return color;
     }
+
 
     /**
      * calc the global effects- reflection and refraction.
@@ -140,14 +169,14 @@ public class RayTracerBasic extends  RayTracerBase{
      * @param n is the normal from the point
      * @return ReflectedRay
      */
-    private Ray constructReflectedRay(Point pointGeo, Vector inRay, Vector n)
+    private Ray constructReflectedRay(GeoPoint pointGeo, Vector inRay, Vector n)
     {
         double vn = inRay.dotProduct(n);
         if (Util.isZero(vn)) {
             return null;
         }
         Vector r = inRay.subtract(n.scale(2 * vn));
-        return new Ray(pointGeo, r,n);
+        return new Ray(pointGeo.point, r,n);
     }
 
     /**
@@ -157,8 +186,8 @@ public class RayTracerBasic extends  RayTracerBase{
      * @param n is the vector - normal from the point
      * @return RefractedRay
      */
-    private Ray constructRefractedRay(Point pointGeo, Vector inRay, Vector n) {
-        return new Ray(pointGeo, inRay,n);
+    private Ray constructRefractedRay(GeoPoint pointGeo, Vector inRay, Vector n) {
+        return new Ray(pointGeo.point, inRay,n);
     }
 
     /**
@@ -294,4 +323,83 @@ public class RayTracerBasic extends  RayTracerBase{
         GeoPoint closestPoint = ray.findClosestGeoPoint(intersections);
         return closestPoint;
     }
+    private List<Ray> constructReflectedRays(GeoPoint geoPoint, Ray ray, double Glossy) {
+        Vector v = ray.getDir();
+        Vector n = geoPoint.geometry.getNormal(geoPoint.point);
+        double nv = alignZero(v.dotProduct(n));
+        // r = v - 2*(v * n) * n
+        Vector r = v.subtract(n.scale(2d * nv)).normalize();
+
+        return raysGrid( new Ray(geoPoint.point,r,n),1,geoPoint.geometry.getMaterial().getkG(), n);
+    }
+
+    private List<Ray> constructRefractedRays(GeoPoint geoPoint, Ray inRay, Vector n) {
+        return raysGrid(new Ray(geoPoint.point, inRay.getDir(), n),-1,geoPoint.geometry.getMaterial().getkG(), n);
+    }
+    List<Ray> raysGrid(Ray ray, int direction, double glossy, Vector n){
+        int numOfRowCol = isZero(glossy)? 1: (int)Math.ceil(Math.sqrt(glossinessRaysNum));
+        if (numOfRowCol == 1) return List.of(ray);
+        Vector Vup ;
+        double Ax= Math.abs(ray.getDir().getX()), Ay= Math.abs(ray.getDir().getY()), Az= Math.abs(ray.getDir().getZ());
+        if (Ax < Ay)
+            Vup= Ax < Az ?  new Vector(0, -ray.getDir().getZ(), ray.getDir().getY()) :
+                    new Vector(-ray.getDir().getY(), ray.getDir().getX(), 0);
+        else
+            Vup= Ay < Az ?  new Vector(ray.getDir().getZ(), 0, -ray.getDir().getX()) :
+                    new Vector(-ray.getDir().getY(), ray.getDir().getX(), 0);
+        Vector Vright = Vup.crossProduct(ray.getDir()).normalize();
+        Point pc=ray.getPoint(distanceGrid);
+        double step = glossy/sizeGrid;
+        Point pij=pc.add(Vright.scale(numOfRowCol/2*-step)).add(Vup.scale(numOfRowCol/2*-step));
+        Vector tempRayVector;
+        Point Pij1;
+
+        List<Ray> rays = new ArrayList<>();
+        rays.add(ray);
+        for (int i = 1; i < numOfRowCol; i++) {
+            for (int j = 1; j < numOfRowCol; j++) {
+                Pij1=pij.add(Vright.scale(i*step)).add(Vup.scale(j*step));
+                tempRayVector =  Pij1.subtract(ray.getP0());
+                if(n.dotProduct(tempRayVector) < 0 && direction == 1) //refraction
+                    rays.add(new Ray(ray.getP0(), tempRayVector));
+                if(n.dotProduct(tempRayVector) > 0 && direction == -1) //reflection
+                    rays.add(new Ray(ray.getP0(), tempRayVector));
+            }
+        }
+
+        return rays;
+    }
+    public Color traceRay(List<Ray> rays)
+    {
+        Color finalColor=null;
+        Color firstColor=null;
+        Color colorTmp=new Color(0,0,0);
+        for(var ray:rays)
+        {
+            List<GeoPoint> intersection = scene.geometries.findGeoIntersections(ray);
+            if (intersection == null)
+            {
+                return scene.getBackground();
+            }
+            GeoPoint closestPoint = ray.findClosestGeoPoint(intersection);
+
+            colorTmp=calcColor(closestPoint, ray) == null ? scene.getBackground() : calcColor(closestPoint, ray);
+            if(finalColor==null)
+            {
+                firstColor=colorTmp;
+                finalColor=new Color(0,0,0);
+                for (int i = 0; i < 10; i++)
+                    finalColor=finalColor.add(colorTmp);
+            }
+
+            if(!colorTmp.equals(firstColor))
+                finalColor=finalColor.add(colorTmp);
+
+        }
+        if(finalColor.equals(firstColor))
+            return firstColor;
+        int size=rays.size()+10;
+        return finalColor.reduce(size);
+    }
+
 }

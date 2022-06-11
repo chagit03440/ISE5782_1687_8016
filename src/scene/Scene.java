@@ -78,4 +78,7 @@ public class Scene {
         return this;
     }
 
+    public Color getBackground() {
+        return  background;
+    }
 }

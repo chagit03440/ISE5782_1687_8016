@@ -80,6 +80,10 @@ public class Material {
         return this;
     }
 
+    public Double3 getkR() {
+        return kR;
+    }
+
     /**
      * Builder patterns setter for field kT
      * @param kT parameter for kT constructor
@@ -93,6 +97,11 @@ public class Material {
         this.kT = new Double3(kT);
         return this;
     }
+
+    public Double3 getkT() {
+        return kT;
+    }
+
     /**
      * Chaining method for setting the glossiness of the material.
      * @param kG the glossiness to set, value in range [0,1]
@@ -103,4 +112,7 @@ public class Material {
         return this;
     }
 
+    public double getkG() {
+        return kG;
+    }
 }
