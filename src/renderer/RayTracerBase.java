@@ -6,6 +6,7 @@ import primitives.Ray;
 import scene.Scene;
 
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * RayTracerBase abstract class that use as an interface for RayTracerBasic
@@ -47,4 +48,11 @@ public abstract class RayTracerBase {
      * @return the color of the point received
      */
     public abstract Color calcColor(GeoPoint geoPoint,Ray ray);
+/**
+ * An abstract function that get a list of ray and return the color of the avarege points that cross the rays
+ * @param rays  that intersect the scene
+ * @return Color
+ */
+
+    public abstract Color traceRay(List<Ray> rays);
 }

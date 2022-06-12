@@ -353,9 +353,8 @@ public class Camera {
                         }
                         else//if we don't want to apply the adaptiveSuperSampling enhancement
                         {
-                            Ray ray = constructRay(nX, nY, pixel.col, pixel.row);
-                            GeoPoint closestPoint = rT.findClosestIntersection(ray);
-                            Color pixelColor = rT.traceRay(ray);
+                           List<Ray>  rays = constructRays(nX, nY, pixel.col, pixel.row);
+                            Color pixelColor = rT.traceRay(rays);
                             iM.writePixel(pixel.col, pixel.row, pixelColor);
 
 

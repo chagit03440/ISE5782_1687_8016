@@ -382,6 +382,12 @@ public class RayTracerBasic extends  RayTracerBase{
 
         return rays;
     }
+
+    /**
+     * An abstract function that get a list of ray and return the color of the avarege points that cross the rays
+     * @param rays  that intersect the scene
+     * @return Color
+     */
     public Color traceRay(List<Ray> rays)
     {
         Color finalColor=null;
