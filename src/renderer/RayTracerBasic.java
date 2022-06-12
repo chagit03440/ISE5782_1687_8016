@@ -29,6 +29,9 @@ public class RayTracerBasic extends  RayTracerBase{
     private int glossinessRaysNum = 36;
     private double distanceGrid = 25;
     private double sizeGrid=4;
+    protected  double beamRadius=20d;//the level of the light
+    protected boolean softShadows=false;
+
 
     public void setDistanceGrid(double distanceGrid) {
         this.distanceGrid = distanceGrid;
@@ -145,7 +148,6 @@ public class RayTracerBasic extends  RayTracerBase{
         return color;
     }
 
-
     /**
      * calc the global effects- reflection and refraction.
      * this func call "calcColor" in recursion to add more and more global effects.
@@ -196,10 +198,11 @@ public class RayTracerBasic extends  RayTracerBase{
      * @param ray is a received ray to calculate intersections with it and the scene
      * @return the color of the point received
      */
-    private Color calcColor(GeoPoint geoPoint,Ray ray) {
+    public Color calcColor(GeoPoint geoPoint,Ray ray) {
         Color ambientLight = scene.ambientLight.getIntensity();
         return calcColor(geoPoint,ray,MAX_CALC_COLOR_LEVEL,new Double3(INITIAL_K)).add(ambientLight);
     }
+
 
     /**
      * Calculate the local effect of light sources on a point
@@ -265,7 +268,17 @@ public class RayTracerBasic extends  RayTracerBase{
         double vrnsh = pow(max(0, -vr), material.nShininess); //vrnsh=max(0,-vr)^nshininess
         return lightIntensity.scale(material.kS.scale(vrnsh)); //Ks * (max(0, - v * r) ^ Nsh) * Il
     }
+    private Double3 transparencyBeam(LightSource lightSource, Vector n, GeoPoint geoPoint,int beam) {
+        Double3 tempKtr = new Double3(0d);
+        List<Vector> beamL = lightSource.getBeamL(geoPoint.point, beamRadius,beam);
 
+        for (Vector vl : beamL) {
+            tempKtr = tempKtr.add(transparency( lightSource,n,vl,geoPoint,beam));
+        }
+        tempKtr = tempKtr.reduce(beamL.size());
+
+        return tempKtr;
+    }
     /**
      * this function is like unshaded but returns how much shading
      * @param geoPoint the point
@@ -311,7 +324,7 @@ public class RayTracerBasic extends  RayTracerBase{
      * @param ray is the ray from the viewer
      * @return the closest intersection to the ray
      */
-    private GeoPoint findClosestIntersection(Ray ray){
+    public GeoPoint findClosestIntersection(Ray ray){
         if (ray == null) {
             return null;
         }

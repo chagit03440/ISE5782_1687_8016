@@ -4,6 +4,8 @@ import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
 
+import java.util.List;
+
 public interface LightSource {
     /**
      * Returns light intensity at given point
@@ -25,4 +27,5 @@ public interface LightSource {
      * @return distance in double
      */
     public double getDistance(Point point);
+    public List<Vector> getBeamL(Point p, double radius, int amount);
 }

@@ -51,6 +51,12 @@ public class Scene {
         this.background = background;
         return this;
     }
+    /**
+     * @return the color of the background of the scene
+     */
+    public Color getGackground() {
+        return background;
+    }
 
     /**
      * @param ambientLight, set the ambient Light  of the scene

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import static java.awt.Color.*;
 
 import renderer.ImageWriter;
-import lighting.*;
 import geometries.*;
 import primitives.*;
 import renderer.*;
@@ -119,14 +118,14 @@ public class ReflectionRefractionTests {
         scene.setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE), new Double3(0.15)));
 
         scene.geometries.add( //
-                new Triangle(new Point(-130, -150, -115), new Point(150, -150, -135), new Point(75, 75, -150)) //
+                new Triangle(new Point(-150, -150, -115), new Point(150, -150, -135), new Point(75, 75, -150)) //
                         .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(60)).setEmission(new Color(java.awt.Color.magenta)), //
-                new Triangle(new Point(-120, -130, -130), new Point(140, -140, -135), new Point(65, 65, -140)), //
+                new Triangle(new Point(-150, -130, -130), new Point(140, -140, -135), new Point(65, 65, -140)), //
                 new Triangle(new Point(110, -150, -150), new Point(-150, 1500, -150),
                         new Point(67, 67, 300)) //
                         .setEmission(new Color(java.awt.Color.ORANGE)) //
                         .setMaterial(new Material().setKr(new Double3(1.0)).setKt(new Double3(0.5))),
-                new Triangle(new Point(150, -150, -150), new Point(-1500, 1500, -1500),
+                new Triangle(new Point(150, -1050, -150), new Point(-1500, 1500, -1500),
                         new Point(-150, -150, -200)) //
                         .setEmission(new Color(0, 120, 220)) //
                         .setMaterial(new Material().setKr(new Double3(1)).setKt(new Double3(0.5))),

@@ -76,6 +76,8 @@ public class Color {
         return new java.awt.Color(ir > 255 ? 255 : ir, ig > 255 ? 255 : ig, ib > 255 ? 255 : ib);
     }
 
+
+
     /**
      * Operation of adding this and one or more other colors (by component)
      *
